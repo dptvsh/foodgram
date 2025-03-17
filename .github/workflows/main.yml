@@ -79,6 +79,7 @@ jobs:
           context: ./infra/
           push: true
           tags: dptvsh/foodgram_gateway:latest
+  
   deploy:
     runs-on: ubuntu-latest
     needs: 
