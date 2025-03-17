@@ -4,6 +4,8 @@ from .models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(custom_filter.FilterSet):
+    """Кастомный фильтр для рецептов."""
+
     is_favorited = custom_filter.BooleanFilter(
         method='filter_is_favorited',
     )
@@ -34,6 +36,8 @@ class RecipeFilter(custom_filter.FilterSet):
 
 
 class IngredientFilter(custom_filter.FilterSet):
+    """Кастомный фильтр для ингредиентов."""
+
     name = custom_filter.CharFilter(
         method='filter_name',
     )

@@ -24,6 +24,8 @@ User = get_user_model()
 
 
 class TagViewSet(viewsets.ModelViewSet):
+    """Вьюсет тегов."""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
@@ -32,6 +34,8 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
+    """Вьюсет ингредиентов."""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
@@ -42,6 +46,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Вьюсет рецептов с дополнительными действиями."""
+
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreateSerializer
     permission_classes = (IsAuthorOrReadOnly,)
@@ -72,8 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 ))
             recipe.short_link = link
             recipe.save()
-        hostname = request.get_host()
-        url = f'{hostname}/s/{recipe.short_link}/'
+        url = f'/s/{recipe.short_link}/'
         return Response(
             {'short-link': request.build_absolute_uri(url)},
             status=status.HTTP_200_OK,
@@ -181,5 +186,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 def redirect_short_link(request, link):
+    """Перенаправление с короткой ссылки на нужный рецепт."""
+
     recipe = get_object_or_404(Recipe, short_link=link)
     return HttpResponseRedirect(f'/recipes/{recipe.pk}')

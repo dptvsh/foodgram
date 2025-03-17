@@ -14,6 +14,8 @@ User = get_user_model()
 
 
 class Base64ImageField(serializers.ImageField):
+    """Кастомный сериализатор для картинок."""
+
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -64,6 +66,8 @@ class TokenObtainSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор пользователя (список и отдельная страница)."""
+
     is_subscribed = serializers.SerializerMethodField()
     avatar = Base64ImageField(required=False)
 
@@ -137,6 +141,7 @@ class FollowSerializer(UserSerializer):
 
 
 class AddFollowSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки на пользователя."""
 
     class Meta:
         model = Follow

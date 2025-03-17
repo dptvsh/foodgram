@@ -5,6 +5,8 @@ from .constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
 class CustomUser(AbstractUser):
+    """Кастомная модель юзера с добавлением аватара."""
+
     email = models.EmailField(
         'Почта',
         max_length=MAX_LENGTH_EMAIL,
@@ -40,6 +42,8 @@ class CustomUser(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель подписок."""
+
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE,
         related_name='follower', verbose_name='Пользователь',

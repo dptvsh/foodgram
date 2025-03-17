@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
+    """Кастомный пермишн, объект доступен либо его автору, либо админу."""
 
     def has_permission(self, request, view):
         return (

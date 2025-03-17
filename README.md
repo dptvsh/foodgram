@@ -26,17 +26,13 @@
 
 ### Локально
 
-1. Перейти в папку infra:
-
-   ```cd infra```
-
-2. Запустить контейнеры в фоновом режиме:
+1. Запустить контейнеры в фоновом режиме:
   
    ```docker compose up -d``` *# Обычная версия*
 
    ```docker compose -f docker-compose.production.yml up -d``` *# Production версия*
 
-3. Последовательно собрать и скопировать статику:
+2. Последовательно собрать и скопировать статику:
 
    *Для обычной версии:*
 
@@ -50,11 +46,17 @@
 
    ```docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/```
 
-4. Применить миграции:
+3. Применить миграции:
 
    ```docker compose exec backend python manage.py migrate``` *# Обычная версия*
 
    ```docker compose -f docker-compose.production.yml exec backend python manage.py migrate``` *# Production версия*
+
+4. Загрузить ингредиенты из подготовленного файла:
+   
+   ```docker compose exec backend python manage.py load_data``` *# Обычная версия*
+   
+   ```docker compose -f docker-compose.production.yml exec backend python manage.py load_data``` *# Production версия*
 
 ### Удаленно
 
@@ -71,6 +73,10 @@
 3. Применить миграции:
 
    ```sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate```
+
+4. Загрузить ингредиенты из подготовленного файла:
+
+   ```sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_data```
 
 ## Технологический стек
 

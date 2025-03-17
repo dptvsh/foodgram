@@ -32,6 +32,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateUpdateIngredientInRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и обновления ингредиентов в рецепте."""
 
     recipe = serializers.PrimaryKeyRelatedField(read_only=True)
     id = serializers.PrimaryKeyRelatedField(
@@ -47,6 +48,7 @@ class CreateUpdateIngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор тегов."""
 
     class Meta:
         model = Tag
@@ -56,8 +58,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
+    """Сериалазатор для списка рецептов."""
 
-    tags = TagSerializer(many=True,)
+    tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientInRecipeSerializer(
         many=True,
@@ -88,6 +91,8 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(RecipeListSerializer):
+    """Сериалазатор создания и обновления рецептов."""
+
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all(),

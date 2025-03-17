@@ -40,6 +40,8 @@ class CustomTokenLogout(views.APIView):
 
 
 class CustomUserViewSet(UserViewSet):
+    """Кастомный вьюсет пользователя с дополнительными действиями."""
+
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
@@ -75,12 +77,13 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=['post', 'delete'],
         detail=True,
-        permission_classes=[IsAuthenticated,],
+        permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id):
         user = request.user
         author = get_object_or_404(User, id=id)
         context = {'request': request}
+
         if request.method == 'POST':
             serializer = AddFollowSerializer(
                 data={
@@ -98,6 +101,7 @@ class CustomUserViewSet(UserViewSet):
                 ).data,
                 status=status.HTTP_201_CREATED,
             )
+
         if not user.follower.filter(following_id=author.id).exists():
             return Response(
                 {'detail': 'Вы не подписаны на этого пользователя!'},
