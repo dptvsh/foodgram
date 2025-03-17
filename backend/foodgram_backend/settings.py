@@ -120,12 +120,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 }
 
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-#     'AUTH_HEADER_TYPES': ('Token',),
-#     'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.TokenObtainSerializer',
-# }
-
 DJOSER = {
     'SERIALIZERS': {
         'current_user': 'users.serializers.UserSerializer',
@@ -135,7 +129,6 @@ DJOSER = {
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-        # 'user_delete': ['rest_framework.permissions.IsAuthenticated'],
     },
     'HIDE_USERS': False,
 }
