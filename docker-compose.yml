@@ -9,27 +9,27 @@ services:
   db:
     container_name: foodgram-db
     image: postgres:13
-    env_file: ../backend/.env
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data/
   backend:
     container_name: foodgram-back
-    build: ../backend/
-    env_file: ../backend/.env
+    build: ./backend/
+    env_file: .env
     volumes:
       - static:/backend_static
       - media:/app/media
 
   frontend:
     container_name: foodgram-front
-    build: ../frontend
+    build: ./frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
   nginx:
     container_name: foodgram-proxy
-    build: .
-    env_file: ../backend/.env
+    build: ./infra
+    env_file: .env
     ports:
       - 8050:80
     volumes:
