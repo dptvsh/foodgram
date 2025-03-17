@@ -28,7 +28,7 @@ services:
       - static_production:/frontend_static
   nginx:
     container_name: foodgram-proxy
-    image: nginx:1.25.4-alpine
+    image: dptvsh/foodgram_gateway
     env_file: ../backend/.env
     ports:
       - 8050:80
