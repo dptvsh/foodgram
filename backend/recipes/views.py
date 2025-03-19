@@ -11,14 +11,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from recipes.filters import IngredientFilter, RecipeFilter
+from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
+from recipes.pagination import RecipePagination
+from recipes.permissions import IsAuthorOrReadOnly
+from recipes.serializers import (IngredientSerializer, RecipeCreateSerializer,
+                                 RecipeListSerializer, TagSerializer)
 from users.serializers import RecipeMinifiedSerializer
-
-from .filters import IngredientFilter, RecipeFilter
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
-from .pagination import RecipePagination
-from .permissions import IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeListSerializer, TagSerializer)
 
 User = get_user_model()
 

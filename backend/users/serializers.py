@@ -3,12 +3,12 @@ import re
 
 from django.contrib.auth import authenticate, get_user_model
 from django.core.files.base import ContentFile
+from django.db.models import Count
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
 from recipes.models import Recipe
-
-from .models import Follow
+from users.models import Follow
 
 User = get_user_model()
 
@@ -90,7 +90,7 @@ class UserRegistrationSerializer(UserCreateSerializer):
 
     password = serializers.CharField(
         label='Пароль',
-        style={"input_type": "password"},
+        style={'input_type': 'password'},
         write_only=True
     )
     id = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -103,15 +103,16 @@ class UserRegistrationSerializer(UserCreateSerializer):
 
     def validate_username(self, value):
         if value.lower() == 'me':
-            raise serializers.ValidationError("Имя 'me' недопустимо.")
+            raise serializers.ValidationError('Имя "me" недопустимо.')
         pattern = r'^[\w.@+-]+\Z'
         if not re.match(pattern, value):
-            raise serializers.ValidationError("Некорректное имя пользователя.")
+            raise serializers.ValidationError('Некорректное имя пользователя.')
         return value
 
 
 class UserAvatarSerializer(serializers.ModelSerializer):
     """"Сериализатор для редактирования аватара."""
+
     avatar = Base64ImageField()
 
     class Meta:
@@ -133,9 +134,13 @@ class FollowSerializer(UserSerializer):
         )
 
     def get_recipes(self, obj):
-        recipes_limit = int(self.context['request'].query_params.get(
+        limit = self.context['request'].query_params.get(
             'recipes_limit', 6,
-        ))
+        )
+        try:
+            recipes_limit = int(limit)
+        except ValueError:
+            raise serializers.ValidationError('Введите целое число.')
         recipes = obj.recipes.all()[:recipes_limit]
         return RecipeMinifiedSerializer(instance=recipes, many=True).data
 
@@ -160,3 +165,11 @@ class AddFollowSerializer(serializers.ModelSerializer):
                 'Вы не можете подписаться на себя!'
             )
         return data
+
+    def to_representation(self, instance):
+        return FollowSerializer(
+            instance=User.objects.filter(
+                id=instance.following_id,
+            ).annotate(recipes_count=Count('recipes')).first(),
+            context=self.context,
+        ).data

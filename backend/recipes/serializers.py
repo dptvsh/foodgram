@@ -1,8 +1,9 @@
+from django.core.validators import MinValueValidator
 from rest_framework import serializers
 
+from recipes.constants import MIN_AMOUNT
+from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 from users.serializers import Base64ImageField, UserSerializer
-
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -38,7 +39,10 @@ class CreateUpdateIngredientInRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all()
     )
-    amount = serializers.IntegerField(write_only=True)
+    amount = serializers.IntegerField(
+        write_only=True,
+        validators=(MinValueValidator(MIN_AMOUNT),),
+    )
 
     class Meta:
         model = IngredientInRecipe
@@ -58,7 +62,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
-    """Сериалазатор для списка рецептов."""
+    """Сериализатор для списка рецептов."""
 
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
@@ -91,7 +95,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(RecipeListSerializer):
-    """Сериалазатор создания и обновления рецептов."""
+    """Сериализатор создания и обновления рецептов."""
 
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -131,30 +135,41 @@ class RecipeCreateSerializer(RecipeListSerializer):
             )
         return ingredients
 
-    def create(self, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        for ingredient in ingredients:
-            IngredientInRecipe.objects.create(
+    def _create_ingredients(self, recipe, ingredients):
+        ingredients_list = [
+            IngredientInRecipe(
                 ingredient=ingredient['id'],
                 recipe=recipe,
                 amount=ingredient['amount'],
             )
+            for ingredient in ingredients
+        ]
+        IngredientInRecipe.objects.bulk_create(
+            ingredients_list,
+        )
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        self._create_ingredients(recipe, ingredients)
         recipe.tags.set(tags)
         return recipe
 
     def update(self, instance, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags', None)
+        ingredients = validated_data.pop('ingredients', None)
+        if ingredients is None:
+            raise serializers.ValidationError(
+                'Вы забыли про ингредиенты!'
+            )
+        if tags is None:
+            raise serializers.ValidationError(
+                'Вы забыли про теги!'
+            )
         instance.tags.set(tags)
         instance.ingredients.clear()
-        for ingredient in ingredients:
-            IngredientInRecipe.objects.create(
-                ingredient=ingredient['id'],
-                recipe=instance,
-                amount=ingredient['amount'],
-            )
+        self._create_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):

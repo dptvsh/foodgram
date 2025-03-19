@@ -11,9 +11,9 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-from .serializers import (AddFollowSerializer, FollowSerializer,
-                          TokenObtainSerializer, UserAvatarSerializer,
-                          UserSerializer)
+from users.serializers import (AddFollowSerializer, FollowSerializer,
+                               TokenObtainSerializer, UserAvatarSerializer,
+                               UserSerializer)
 
 User = get_user_model()
 
@@ -95,10 +95,7 @@ class CustomUserViewSet(UserViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(
-                FollowSerializer(
-                    instance=user.annotate(recipes_count=Count('recipes')),
-                    context=context
-                ).data,
+                serializer.data,
                 status=status.HTTP_201_CREATED,
             )
 

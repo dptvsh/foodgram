@@ -1,6 +1,6 @@
 from django_filters import rest_framework as custom_filter
 
-from .models import Ingredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(custom_filter.FilterSet):
@@ -24,12 +24,16 @@ class RecipeFilter(custom_filter.FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         user = self.request.user
+        if not user.is_authenticated and value:
+            return queryset.none()
         if value:
             return queryset.filter(favorited_user__user=user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
+        if not user.is_authenticated and value:
+            return queryset.none()
         if value:
             return queryset.filter(in_shopping_cart__user=user)
         return queryset

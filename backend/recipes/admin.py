@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
 
 
 @admin.register(Ingredient)
@@ -15,6 +16,7 @@ class IngredientAdmin(admin.ModelAdmin):
 class IngredientInRecipeInline(admin.TabularInline):
     model = IngredientInRecipe
     autocomplete_fields = ('ingredient',)
+    min_num = 1
 
 
 @admin.register(Tag)
@@ -46,3 +48,7 @@ class RecipeAdmin(admin.ModelAdmin):
         return ', '.join([tag.name for tag in obj.tags.all()])
 
     display_tags.short_description = 'Теги'
+
+
+admin.site.register(Favorite)
+admin.site.register(ShoppingCart)
