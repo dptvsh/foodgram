@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
     )
     avatar = models.ImageField(
         upload_to='users/',
-        null=True,
+        null=True, blank=True,
         default=None,
     )
     USERNAME_FIELD = 'email'

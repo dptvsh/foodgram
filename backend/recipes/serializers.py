@@ -157,19 +157,11 @@ class RecipeCreateSerializer(RecipeListSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        tags = validated_data.pop('tags', None)
-        ingredients = validated_data.pop('ingredients', None)
-        if ingredients is None:
-            raise serializers.ValidationError(
-                'Вы забыли про ингредиенты!'
-            )
-        if tags is None:
-            raise serializers.ValidationError(
-                'Вы забыли про теги!'
-            )
-        instance.tags.set(tags)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
         instance.ingredients.clear()
         self._create_ingredients(instance, ingredients)
+        instance.tags.set(tags)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
